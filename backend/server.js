@@ -129,6 +129,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  📦 Imports and Configuration
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// server.js
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -136,7 +137,8 @@ const dotenv = require("dotenv").config();
 const connectDB = require("./config/db");
 const nodemailer = require("nodemailer");
 
-// Debugging env (optional)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  🔗 Environment Variables (Debugging)
 console.log("EMAIL_USER is", process.env.EMAIL_USER);
 console.log("EMAIL_PASS is", process.env.EMAIL_PASS ? "loaded" : "empty");
 console.log("INDIANRAIL_KEY", process.env.INDIANRAIL_KEY);
@@ -144,12 +146,10 @@ console.log("RAPIDAPI_KEY", process.env.RAPIDAPI_KEY);
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  🔗 Connect to MongoDB
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 connectDB();
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  ⚙️ Express App Setup
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const app = express();
 
 app.use(
@@ -161,7 +161,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Optional: Log all requests
+// Optional: log all requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   next();
@@ -169,7 +169,6 @@ app.use((req, res, next) => {
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  🚏 API Routes
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/events", require("./routes/events"));
 app.use("/api/tickets", require("./routes/tickets"));
@@ -190,11 +189,9 @@ app.get("/api", (req, res) => {
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  🌐 Serve React Frontend (Build Folder)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ─── Serve React Frontend ───
 const frontendBuildPath = path.join(__dirname, "..", "frontend", "build");
 
-// Serve React static files
+// Serve static frontend files
 app.use(express.static(frontendBuildPath));
 
 // Serve React index.html for all non-API routes
@@ -202,15 +199,13 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(frontendBuildPath, "index.html"));
 });
 
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  🚀 Start Server
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📍 API URL: http://localhost:${PORT}`);
   console.log("🌐 Frontend URL:", process.env.FRONTEND_URL);
   console.log("⏰ Started at:", new Date().toLocaleString());
@@ -219,7 +214,6 @@ const server = app.listen(PORT, () => {
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  🧩 Error & Shutdown Handling
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 process.on("unhandledRejection", (err) => {
   console.error("❌ Unhandled Promise Rejection:", err);
   server.close(() => process.exit(1));
@@ -232,10 +226,7 @@ process.on("uncaughtException", (err) => {
 
 process.on("SIGTERM", () => {
   console.log("👋 SIGTERM received. Shutting down gracefully...");
-  server.close(() => {
-    console.log("✅ Process terminated");
-  });
+  server.close(() => console.log("✅ Process terminated"));
 });
 
 module.exports = app;
-
