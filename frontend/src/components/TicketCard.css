@@ -1,0 +1,220 @@
+.ticket-card {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition);
+  position: relative;
+  border: 2px solid var(--border-color);
+}
+
+.ticket-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, 
+    var(--color-primary) 0%, 
+    var(--color-secondary) 50%, 
+    var(--color-primary) 100%);
+}
+
+.ticket-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 2px dashed var(--border-color);
+}
+
+.ticket-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.ticket-event-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.ticket-type {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ticket-body {
+  padding: 1.5rem;
+}
+
+.ticket-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ticket-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.ticket-icon {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.ticket-info-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ticket-label {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.ticket-value {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.ticket-price-tag {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+.ticket-purchase-date {
+  text-align: center;
+  padding: 1rem;
+  background: var(--color-bg-gray);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.ticket-footer {
+  padding: 1.5rem;
+  border-top: 2px dashed var(--border-color);
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.qr-code-section {
+  padding: 2rem;
+  background: var(--color-bg-gray);
+  border-top: 2px dashed var(--border-color);
+}
+
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.qr-code-container canvas {
+  border: 4px solid white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+}
+
+.qr-instruction {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Decorative Perforations */
+.ticket-perforations {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: var(--color-bg-gray);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: inset 0 0 0 2px var(--border-color);
+}
+
+.ticket-perforations-left {
+  left: -15px;
+}
+
+.ticket-perforations-right {
+  right: -15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ticket-event-title {
+    font-size: 1.25rem;
+  }
+
+  .ticket-info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .ticket-price-tag {
+    font-size: 1.25rem;
+    padding: 0.625rem 1.25rem;
+  }
+
+  .ticket-header-content {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .qr-code-container canvas {
+    width: 180px !important;
+    height: 180px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ticket-header,
+  .ticket-body,
+  .ticket-footer {
+    padding: 1rem;
+  }
+
+  .qr-code-section {
+    padding: 1.5rem;
+  }
+
+  .ticket-footer {
+    flex-direction: column;
+  }
+
+  .ticket-footer .btn {
+    width: 100%;
+  }
+}

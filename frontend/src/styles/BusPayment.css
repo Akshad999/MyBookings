@@ -1,0 +1,272 @@
+.payment-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-wrapper {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.payment-card {
+  background: white;
+  border-radius: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.payment-header {
+  background: linear-gradient(135deg, #ff9966, #ff5e62);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  color: white;
+}
+
+.payment-icon {
+  margin-bottom: 1rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.payment-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.payment-header p {
+  font-size: 1rem;
+  opacity: 0.95;
+  margin: 0;
+}
+
+.booking-details {
+  padding: 2rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.booking-details h3 {
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+  font-weight: 700;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-value {
+  font-size: 1rem;
+  color: #1f2937;
+  font-weight: 600;
+  text-align: right;
+}
+
+.detail-value.route {
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+.detail-value.seats {
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+.total-row {
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.total-row .detail-label {
+  font-size: 1.25rem;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.total-row .detail-value.total {
+  font-size: 1.75rem;
+  color: #ff6a3d;
+  font-weight: 800;
+}
+
+.payment-methods {
+  padding: 2rem;
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.payment-methods h3 {
+  font-size: 1.25rem;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+}
+
+.payment-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 0.75rem;
+  border: 2px solid #e5e7eb;
+}
+
+.payment-info svg {
+  color: #7c3aed;
+}
+
+.payment-info p {
+  margin: 0;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.btn-complete-payment {
+  width: calc(100% - 4rem);
+  margin: 2rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-complete-payment:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn-complete-payment:active {
+  transform: translateY(-1px);
+}
+
+.btn-cancel-payment {
+  width: calc(100% - 4rem);
+  margin: 0 2rem 2rem 2rem;
+  padding: 1rem;
+  background: white;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
+  border-radius: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-cancel-payment:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .payment-container {
+    padding: 1rem;
+  }
+
+  .payment-card {
+    border-radius: 1.5rem;
+  }
+
+  .payment-header {
+    padding: 2rem 1.5rem;
+  }
+
+  .payment-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .booking-details {
+    padding: 1.5rem;
+  }
+
+  .booking-details h3 {
+    font-size: 1.25rem;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .detail-value {
+    text-align: left;
+  }
+
+  .total-row .detail-label {
+    font-size: 1.125rem;
+  }
+
+  .total-row .detail-value.total {
+    font-size: 1.5rem;
+  }
+
+  .btn-complete-payment,
+  .btn-cancel-payment {
+    width: calc(100% - 3rem);
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .payment-header p {
+    font-size: 0.875rem;
+  }
+
+  .detail-label,
+  .detail-value {
+    font-size: 0.875rem;
+  }
+
+  .total-row .detail-value.total {
+    font-size: 1.25rem;
+  }
+
+  .btn-complete-payment {
+    font-size: 1rem;
+    padding: 1rem;
+  }
+}

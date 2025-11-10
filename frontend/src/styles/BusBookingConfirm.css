@@ -1,0 +1,159 @@
+.confirm-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-card {
+  background: white;
+  border-radius: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.confirm-card h2 {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  padding: 2rem;
+  margin: 0;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.booking-summary {
+  padding: 2rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-row span:first-child {
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.summary-row strong {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: right;
+}
+
+.total-row {
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.total-row span:first-child {
+  font-size: 1.25rem;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.total-row strong {
+  font-size: 1.75rem;
+  color: #ff6a3d;
+  font-weight: 800;
+}
+
+.btn-proceed-payment {
+  width: calc(100% - 4rem);
+  margin: 0 2rem 2rem 2rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-proceed-payment:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn-proceed-payment:active {
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .confirm-container {
+    padding: 1rem;
+  }
+
+  .confirm-card {
+    border-radius: 1.5rem;
+  }
+
+  .confirm-card h2 {
+    font-size: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .booking-summary {
+    padding: 1.5rem;
+  }
+
+  .summary-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .summary-row strong {
+    text-align: left;
+  }
+
+  .total-row span:first-child {
+    font-size: 1.125rem;
+  }
+
+  .total-row strong {
+    font-size: 1.5rem;
+  }
+
+  .btn-proceed-payment {
+    width: calc(100% - 3rem);
+    margin: 0 1.5rem 1.5rem 1.5rem;
+    font-size: 1rem;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirm-card h2 {
+    font-size: 1.25rem;
+  }
+
+  .summary-row span:first-child,
+  .summary-row strong {
+    font-size: 0.875rem;
+  }
+
+  .total-row strong {
+    font-size: 1.25rem;
+  }
+}

@@ -1,0 +1,93 @@
+.payment-status-container {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(120deg,#eef2ff 10%,#fdf2f8 100%);
+  padding: 2rem 1rem;
+}
+
+.status-card {
+  max-width: 360px;
+  width: 100%;
+  margin: auto;
+  background: white;
+  border-radius: 2rem;
+  box-shadow: 0 8px 32px rgba(86, 0, 160, 0.14);
+  padding: 2.6rem 1.7rem;
+  text-align: center;
+  animation: fadeup 0.5s;
+}
+
+.status-icon {
+  margin-bottom: 1.3rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.success-icon {
+  color: #10b981;
+  filter: drop-shadow(0 2px 18px #10b98144);
+}
+.cancel-icon {
+  color: #ef4444;
+  filter: drop-shadow(0 2px 18px #ef444444);
+}
+
+.status-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #50259a;
+  margin-bottom: 1rem;
+}
+
+.cancel-card .status-title {
+  color: #ef4444;
+}
+.success-card .status-title {
+  color: #10b981;
+}
+
+.status-message {
+  color: #666;
+  font-size: 1.22rem;
+  margin-bottom: 2.1rem;
+  line-height: 1.65;
+}
+
+.status-btn {
+  padding: 0.7rem 1.6rem;
+  font-size: 1.11rem;
+  font-weight: 700;
+  border-radius: 1.3rem;
+  border: none;
+  margin: 0.7rem 0;
+  background: linear-gradient(120deg,#a5b4fc 30%,#7c3aed 100%);
+  color: white;
+  box-shadow: 0 3px 15px #a5b4fc22;
+  cursor: pointer;
+  transition: filter 0.16s, background 0.2s;
+}
+
+.status-btn:hover,
+.status-btn:focus {
+  filter: brightness(1.2);
+  background: linear-gradient(120deg,#7c3aed 30%,#a5b4fc 100%);
+}
+
+.status-btn.alt {
+  background: white;
+  color: #7c3aed;
+  border: 1.5px solid #a5b4fc;
+}
+
+@media (max-width: 500px) {
+  .status-card { padding: 1.3rem 0.8rem; border-radius: 1.2rem; }
+  .status-title { font-size: 1.24rem; }
+  .status-message { font-size: 1rem; }
+}
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0);}
+}

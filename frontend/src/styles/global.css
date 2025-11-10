@@ -1,0 +1,32 @@
+:root {
+  --color-primary: #5d5fef;
+  --color-secondary: #f7971e;
+  --color-accent: #e74694;
+  --color-bg-glass: rgba(255, 255, 255, 0.68);
+  --color-bg-dark: #181924;
+  --color-bg-light: #f8fafc;
+  --color-card-glass: rgba(250, 250, 255, 0.80);
+  --color-text-main: #22223b;
+  --color-text-sub: #67697c;
+  --radius-main: 2rem; 
+  --radius-btn: 1rem;
+  --shadow-xl: 0 8px 32px 0 rgba(60,60,150,0.16);
+  --shadow-md: 0 4px 14px 0 rgba(44,44,100,0.10);
+  --transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+}
+body {
+  font-family: 'Inter', 'Rubik', Arial, sans-serif;
+  background: linear-gradient(135deg, #e0e7ff 0%, #fff3e9 100%);
+  color: var(--color-text-main);
+  min-height: 100vh;
+  letter-spacing: .01em;
+}
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.22s;
+}
+a:hover { color: var(--color-accent); }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 8px; }
+.text-center { text-align: center; }
+@media (max-width: 768px) { .container { padding: 0 1rem; } }
