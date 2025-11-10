@@ -186,13 +186,18 @@ app.get("/api", (req, res) => {
 
 // ───────── Serve React Frontend ─────────
 const frontendBuildPath = path.join(__dirname, "..", "frontend", "build");
+
+// Serve static files
 app.use(express.static(frontendBuildPath));
 
-// Catch-all: serve React index.html for all other routes
-app.get("*", (req, res) => {
+// Catch-all route for React Router (must be AFTER all API routes)
+app.get("/*", (req, res) => {
+  // Only serve index.html for non-API routes
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ message: "API route not found" });
+  }
   res.sendFile(path.join(frontendBuildPath, "index.html"));
 });
-
 // ───────── Start Server ─────────
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
