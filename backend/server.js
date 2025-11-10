@@ -194,13 +194,14 @@ app.get("/api", (req, res) => {
 // ─── Serve React Frontend ───
 const frontendBuildPath = path.join(__dirname, "..", "frontend", "build");
 
-// Serve static files
+// Serve React static files
 app.use(express.static(frontendBuildPath));
 
-// Serve index.html for all other routes (React Router)
-app.get("/*", (req, res) => {
+// Serve React index.html for all non-API routes
+app.get("*", (req, res) => {
   res.sendFile(path.join(frontendBuildPath, "index.html"));
 });
+
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  🚀 Start Server
