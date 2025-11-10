@@ -5,7 +5,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "seed": "node SeedData.js",
-     "seed:stations": "node scripts/seedStations.js",
+    "seed:stations": "node scripts/seedStations.js",
     "seed:trains": "node scripts/seedTrains.js",
     "seed:all": "npm run seed:stations && npm run seed:trains"
   },
