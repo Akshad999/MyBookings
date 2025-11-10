@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "scripts": {
-    "start": "node server.js",
+    "start": "node backend/server.js",
     "dev": "nodemon server.js",
     "seed": "node SeedData.js",
     "seed:stations": "node scripts/seedStations.js",
