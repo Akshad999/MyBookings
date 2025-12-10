@@ -13,13 +13,18 @@ router.post("/send", async (req, res) => {
   otps.set(email, otp);
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER, // your Gmail
-        pass: process.env.EMAIL_PASS, // Gmail App Password
-      },
-    });
+   const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // TLS disabled for STARTTLS
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false, // REQUIRED for Render
+  },
+});
 
     await transporter.sendMail({
       from: `"Mybookings.in" <${process.env.EMAIL_USER}>`,
