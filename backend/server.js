@@ -149,12 +149,32 @@ connectDB();
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  process.env.FRONTEND_URL,                     // your production frontend
+  "https://mybookings-three.vercel.app",       // Vercel domain
+  "https://mybookings-in.vercel.app",          // If you also use this
+  "http://localhost:3000",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    credentials: true,
+   origin: (origin, callback) => {
+  if (!origin) return callback(null, true); // allow mobile/postman
+
+  if (allowedOrigins.includes(origin)) {
+    return callback(null, true);
+  } else {
+    console.log("❌ Blocked by CORS:", origin);
+    return callback(null, false); // must be 'null, false'
+  }
+},
+methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+allowedHeaders: ["Content-Type", "Authorization"],
+credentials: true,
+
   })
 );
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
