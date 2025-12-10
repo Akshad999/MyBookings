@@ -150,11 +150,12 @@ const app = express();
 
 // Middleware
 const allowedOrigins = [
-  process.env.FRONTEND_URL,                     // your production frontend
-  "https://mybookings-three.vercel.app",       // Vercel domain
-  "https://mybookings-in.vercel.app",          // If you also use this
+  process.env.FRONTEND_URL,
+  "https://my-bookings-three.vercel.app",  // Correct domain
+  "https://mybookings-in.vercel.app",      // if exists
   "http://localhost:3000",
 ].filter(Boolean);
+
 
 app.use(
   cors({
