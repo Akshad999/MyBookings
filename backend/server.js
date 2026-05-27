@@ -19,10 +19,22 @@
 // const app = express();
 
 // // Middleware
-// app.use(cors({
-//   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-//   credentials: true,
-// }));
+// app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.log("❌ Blocked by CORS:", origin);
+        return callback(null, false);
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 // // Body parser middleware
 // app.use(express.json());
@@ -253,11 +265,31 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Define allowed origins for CORS
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://my-bookings-three.vercel.app",
+  "https://mybookings-in.vercel.app",
+  "http://localhost:3000",
+].filter(Boolean);
+
 // Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.log("❌ Blocked by CORS:", origin);
+        return callback(null, false);
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

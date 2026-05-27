@@ -1,47 +1,43 @@
-# MyBookings
+# 📚 Deployment Guide – MyBookings
 
-🚆 MyBookings.in — Local Ticket Booking System
+## Backend (Vercel)
 
-MyBookings.in is a basic yet functional railway ticket booking web application built using React.js, JavaScript, and CSS.
-The system allows users to search for trains, view available routes, and make bookings using the IRCTC API.
+1. Open the Vercel dashboard → **my‑bookings‑three** project.
+2. Go to **Settings → Environment Variables**.
+3. Add:
 
-Currently, it focuses only on railway bookings, but the platform is designed for future integration of bus services and real-time tracking once the required APIs become available.
+| Key            | Value                                 |
+|----------------|---------------------------------------|
+| `FRONTEND_URL` | `https://mybookings‑in.onrender.com` |
 
-✨ Features
+4. Click **Save**.
+5. Trigger a **Redeploy** (button on the Deployments page).
 
-🔍 Train Search — Find available trains between two stations using the IRCTC API.
+## Frontend (Render)
 
-🎫 Ticket Booking — Users can easily book tickets with smooth and functional booking logic.
+1. Open the Render dashboard → **mybookings‑in** service.
+2. Go to **Environment → Add Environment Variable**.
+3. Add:
 
-💾 Booking Management — Users can view their booking history and ticket details.
+| Key                | Value                                 |
+|--------------------|---------------------------------------|
+| `REACT_APP_API_URL`| `https://my‑bookings‑three.vercel.app` |
 
-📱 OTP Verification System — A working OTP-based signup feature that helps verify new users and send them notifications.
+4. Save and click **Manual Deploy** (or push a small commit).
 
-🧭 Responsive UI — Clean and user-friendly design using React and CSS.
+## Verify
 
-🚧 Future Enhancements
+- Visit `https://mybookings‑in.onrender.com` → login → OTP should succeed without CORS errors.
+- Open the Train Payment page (`/train/payment`) → you should see the new gradient UI, animated header, and responsive layout.
 
-📍 Real-Time Train Tracking — Add live train location updates once an affordable API is available.
+---
 
-🚌 Bus Booking System — Extend the platform to support bus routes and seat bookings.
+## Optional: Local testing script
 
-📡 Location-Based Suggestions — Automatically detect nearby stations for quick searching.
+If you want to spin up both projects locally with the same settings, run:
 
-🔔 Live Notifications — Notify users about train delays, cancellations, or booking updates in real-time.
+```bash
+./scripts/deploy.sh
+```
 
-🛠️ Tech Stack
-
-Frontend: React.js, JavaScript, CSS
-
-Backend (if applicable): Node.js / Express (for OTP or future APIs)
-
-API: IRCTC Public API
-
-Tools: VS Code, npm
-
-💡 Summary
-
-MyBookings.in demonstrates a practical implementation of a local ticket booking system, focused on simplicity and usability.
-While real-time tracking and bus integrations are planned for future updates, the app currently provides a fully working booking system with a secure OTP-based signup and notification feature.
-
-Future versions aim to make MyBookings.in a complete, real-time multi-transport platform for a seamless travel booking experience.
+(See the script for details.)
