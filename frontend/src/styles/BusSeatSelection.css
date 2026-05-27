@@ -128,71 +128,171 @@
 .seats-container {
   padding: 2rem 1.5rem;
   background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.deck-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 320px;
+  justify-content: center;
+}
+
+.deck-tab {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid #e5e7eb;
+  background: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #4b5563;
+  text-align: center;
+}
+
+.deck-tab.active {
+  background: #764ba2;
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 4px 10px rgba(118, 75, 162, 0.2);
+}
+
+.bus-body {
+  border: 4px solid #4b5563;
+  border-radius: 2rem;
+  padding: 2rem 1.5rem;
+  background: #f3f4f6;
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .driver-section {
-  text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding: 0.75rem;
-  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-  border-radius: 0.75rem;
-  font-weight: 600;
-  color: #4338ca;
-  border: 2px solid #818cf8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0.5rem 1rem;
+  background: #e5e7eb;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  color: #374151;
+  border: 1px solid #d1d5db;
 }
 
-.seats-grid {
+.seats-grid-seater {
   display: grid;
   grid-template-columns: repeat(5, 1fr); /* 2 seats, aisle, 2 seats */
-  gap: 0.75rem;
-  max-width: 450px;
-  margin: 0 auto;
+  gap: 0.75rem 0.5rem;
+  width: 100%;
 }
 
-.aisle {
+.seats-grid-sleeper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 2 sleeper beds, aisle, 1 sleeper bed */
+  gap: 1.25rem 0.75rem;
+  width: 100%;
+}
+
+.aisle-spacer {
   background: transparent;
-  pointer-events: none;
+  visibility: hidden;
+  height: 100%;
 }
 
-.seat {
+/* Chair seat style */
+.seat-chair {
   aspect-ratio: 1;
   border: 2px solid #d1d5db;
-  border-radius: 0.75rem;
-  background: #10b981;
-  color: white;
+  border-radius: 0.5rem;
+  background: #e8f5e9;
+  color: #2e7d32;
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  height: 48px;
 }
 
-.seat:hover:not(:disabled) {
-  transform: scale(1.15);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-  z-index: 10;
+.seat-chair::before {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  width: 70%;
+  height: 4px;
+  background: currentColor;
+  border-radius: 2px;
+  opacity: 0.4;
 }
 
-.seat.selected {
-  background: #3b82f6;
-  border-color: #2563eb;
-  animation: pulse 0.5s ease;
+/* Sleeper bed style */
+.seat-sleeper {
+  height: 70px;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
-.seat.booked {
-  background: #ef4444;
-  border-color: #dc2626;
+/* Pillow for sleeper */
+.seat-sleeper::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  width: 80%;
+  height: 12px;
+  background: currentColor;
+  opacity: 0.2;
+  border-radius: 3px;
+}
+
+.seat-chair.available, .seat-sleeper.available {
+  background: #e8f5e9;
+  border-color: #81c784;
+  color: #2e7d32;
+}
+
+.seat-chair.selected, .seat-sleeper.selected {
+  background: #3b82f6 !important;
+  border-color: #1d4ed8 !important;
+  color: white !important;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  transform: scale(1.05);
+}
+
+.seat-chair.booked, .seat-sleeper.booked {
+  background: #ffebee !important;
+  border-color: #ef9a9a !important;
+  color: #c62828 !important;
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+.seat-chair:hover:not(:disabled), .seat-sleeper:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .seat-modal-footer {

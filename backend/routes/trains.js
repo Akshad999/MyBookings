@@ -947,10 +947,178 @@ const router = express.Router();
 const axios = require('axios');
 const Station = require('../models/Station');
 const Booking = require('../models/Booking');
+const { INDIAN_LOCATIONS } = require('../config/indianLocations');
 
 // RapidAPI IRCTC config
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST || 'irctc1.p.rapidapi.com';
+
+// Helper to flatten stations from database
+function getAllStations() {
+  const stations = [];
+  INDIAN_LOCATIONS.forEach(state => {
+    state.cities.forEach(city => {
+      city.railwayStations.forEach(st => {
+        stations.push({
+          code: st.code.toUpperCase(),
+          name: st.name,
+          city: city.name,
+          state: state.state,
+          lat: city.lat,
+          lng: city.lng
+        });
+      });
+    });
+  });
+  return stations;
+}
+
+// Helper to calculate distance in km
+function getDistance(lat1, lon1, lat2, lon2) {
+  if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+  const R = 6371; // Radius of Earth
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return Math.round(R * c);
+}
+
+// Dynamic train schedule generator
+function generateDynamicTrains(fromCode, toCode) {
+  const stations = getAllStations();
+  const fromSt = stations.find(s => s.code === fromCode.toUpperCase());
+  const toSt = stations.find(s => s.code === toCode.toUpperCase());
+  
+  let distance = 0;
+  if (fromSt && toSt) {
+    distance = getDistance(fromSt.lat, fromSt.lng, toSt.lat, toSt.lng) || 350;
+    if (distance === 0) distance = 25; // Same city station connections
+  } else {
+    // Deterministic fallback distance
+    let hash = 0;
+    for (let i = 0; i < fromCode.length; i++) hash += fromCode.charCodeAt(i);
+    for (let i = 0; i < toCode.length; i++) hash += toCode.charCodeAt(i);
+    distance = 120 + (hash % 12) * 80;
+  }
+
+  const fromCity = fromSt ? fromSt.city : fromCode;
+  const toCity = toSt ? toSt.city : toCode;
+  const fromName = fromSt ? fromSt.name : fromCode + " Jn";
+  const toName = toSt ? toSt.name : toCode + " Jn";
+
+  // Different templates for trains in India
+  const trainTemplates = [
+    {
+      type: "Shatabdi Express",
+      speed: 85,
+      startHour: 6,
+      classes: ["CC", "EC"],
+      number: "120" + (10 + (fromCode.charCodeAt(0) % 9)),
+      runningDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    },
+    {
+      type: "Rajdhani Express",
+      speed: 80,
+      startHour: 17,
+      classes: ["3A", "2A", "1A"],
+      number: "129" + (50 + (fromCode.charCodeAt(0) % 9)),
+      runningDays: ["Mon", "Wed", "Fri", "Sun"]
+    },
+    {
+      type: "Superfast Express",
+      speed: 60,
+      startHour: 10,
+      classes: ["SL", "3A", "2A", "1A", "2S"],
+      number: "126" + (20 + (fromCode.charCodeAt(0) % 9)),
+      runningDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    },
+    {
+      type: "Garib Rath Express",
+      speed: 65,
+      startHour: 13,
+      classes: ["3A"],
+      number: "122" + (30 + (fromCode.charCodeAt(0) % 9)),
+      runningDays: ["Tue", "Thu", "Sat"]
+    },
+    {
+      type: "Jan Shatabdi",
+      speed: 70,
+      startHour: 14,
+      classes: ["2S", "CC"],
+      number: "120" + (60 + (fromCode.charCodeAt(0) % 9)),
+      runningDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    }
+  ];
+
+  // Select train types based on distance
+  let activeTemplates = [];
+  if (distance < 500) {
+    activeTemplates = [trainTemplates[0], trainTemplates[2], trainTemplates[4]]; // Shatabdi, Superfast, Jan Shatabdi
+  } else {
+    activeTemplates = [trainTemplates[1], trainTemplates[2], trainTemplates[3]]; // Rajdhani, Superfast, Garib Rath
+  }
+
+  // Handle Shimla Toy Train routes specifically as it is iconic
+  if ((fromCode === 'KLK' && toCode === 'SML') || (fromCode === 'SML' && toCode === 'KLK')) {
+    return [{
+      train_number: fromCode === 'KLK' ? '52457' : '52458',
+      train_name: fromCode === 'KLK' ? 'Kalka-Shimla Toy Train' : 'Shimla-Kalka Toy Train',
+      train_type: 'Toy Train',
+      from_station_code: fromCode,
+      from_station_name: fromName,
+      to_station_code: toCode,
+      to_station_name: toName,
+      from_time: fromCode === 'KLK' ? '07:00' : '15:50',
+      to_time: fromCode === 'KLK' ? '12:10' : '20:00',
+      duration: fromCode === 'KLK' ? '5h 10m' : '4h 10m',
+      class_type: ['2S', 'FC'],
+      running_days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      distance: 96,
+      price: 250,
+      source: 'fallback'
+    }];
+  }
+
+  return activeTemplates.map((t, idx) => {
+    const travelTimeHours = distance / t.speed;
+    const durationMins = Math.round(travelTimeHours * 60);
+    const durationHoursStr = Math.floor(durationMins / 60);
+    const durationMinsStr = durationMins % 60;
+    
+    const startHour = (t.startHour + (idx * 2)) % 24;
+    const startMin = (idx * 15) % 60;
+    const depTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+    
+    const arrHour = Math.floor(startHour + travelTimeHours) % 24;
+    const arrMin = Math.round(startMin + (travelTimeHours % 1 * 60)) % 60;
+    const arrTime = `${String(arrHour).padStart(2, '0')}:${String(arrMin).padStart(2, '0')}`;
+
+    // Base fare: Sleeper SL is ₹0.7 per km, AC Chair Car CC is ₹1.2 per km, 3A is ₹1.8 per km, 2A is ₹2.4, 1A is ₹3.6
+    let basePrice = Math.max(120, Math.round(distance * 0.8));
+
+    return {
+      train_number: t.number + (idx % 2 === 0 ? "1" : "2"),
+      train_name: `${fromCity} - ${toCity} ${t.type}`,
+      train_type: t.type.split(" ")[0],
+      from_station_code: fromCode,
+      from_station_name: fromName,
+      to_station_code: toCode,
+      to_station_name: toName,
+      from_time: depTime,
+      to_time: arrTime,
+      duration: `${durationHoursStr}h ${durationMinsStr}m`,
+      class_type: t.classes,
+      running_days: t.runningDays,
+      distance: distance,
+      price: basePrice,
+      source: 'fallback'
+    };
+  });
+}
 
 // ===================== STATION SEARCH =====================
 router.get('/stations/search', async (req, res) => {
@@ -964,111 +1132,22 @@ router.get('/stations/search', async (req, res) => {
     }
     console.log('🔍 Searching stations for:', query);
 
-    // Try RapidAPI IRCTC station search (autocomplete)
-    if (RAPIDAPI_KEY) {
-      try {
-        const response = await axios.get(
-          `https://${RAPIDAPI_HOST}/api/v3/stations`,
-          {
-            params: { station: query },
-            headers: {
-              'x-rapidapi-key': RAPIDAPI_KEY,
-              'x-rapidapi-host': RAPIDAPI_HOST
-            },
-            timeout: 12000
-          }
-        );
-        const apiStations = response.data.data || [];
-        console.log('✅ Found stations from IRCTC API:', apiStations.length);
-
-        // Cache in local DB for later offline search
-        for (const station of apiStations.slice(0, 20)) {
-          await Station.findOneAndUpdate(
-            { stationCode: station.code },
-            {
-              stationCode: station.code,
-              stationName: station.name,
-              city: station.name.split(' ')[0],
-              state: station.state || 'India',
-              isActive: true
-            },
-            { upsert: true, new: true }
-          );
-        }
-
-        if (apiStations.length > 0) {
-          return res.json({
-            success: true,
-            count: apiStations.length,
-            stations: apiStations.map(s => ({
-              code: s.code,
-              name: s.name,
-              state: s.state || 'India',
-              city: s.name.split(' ')[0]
-            })),
-            source: 'irctc_api'
-          });
-        }
-      } catch (err) {
-        console.error('RapidAPI IRCTC error:', err.message);
-      }
-    }
-
-    // Fallback: local MongoDB cache
-    const cachedStations = await Station.find({
-      $or: [
-        { stationName: { $regex: query, $options: 'i' } },
-        { stationCode: { $regex: query, $options: 'i' } },
-        { city: { $regex: query, $options: 'i' } }
-      ],
-      isActive: true
-    }).limit(20);
-
-    if (cachedStations.length > 0) {
-      console.log('✅ Using cached stations:', cachedStations.length);
-      return res.json({
-        success: true,
-        count: cachedStations.length,
-        stations: cachedStations.map(s => ({
-          code: s.stationCode,
-          name: s.stationName,
-          city: s.city,
-          state: s.state
-        })),
-        source: 'cache'
-      });
-    }
-
-    // Manual fallback for most common stations
-    const manualStations = {
-      'cdg': { code: 'CDG', name: 'Chandigarh', city: 'Chandigarh', state: 'Chandigarh' },
-      'klk': { code: 'KLK', name: 'Kalka', city: 'Kalka', state: 'Haryana' },
-      'ndls': { code: 'NDLS', name: 'New Delhi', city: 'Delhi', state: 'Delhi' },
-      'bct': { code: 'BCT', name: 'Mumbai Central', city: 'Mumbai', state: 'Maharashtra' },
-      'hwh': { code: 'HWH', name: 'Howrah Jn', city: 'Kolkata', state: 'West Bengal' },
-      'sml': { code: 'SML', name: 'Shimla', city: 'Shimla', state: 'Himachal Pradesh' } // Added Shimla
-    };
-
     const searchLower = query.toLowerCase();
-    const manualResults = Object.values(manualStations).filter(s =>
+    const stations = getAllStations();
+    
+    const filtered = stations.filter(s => 
       s.name.toLowerCase().includes(searchLower) ||
-      s.code.toLowerCase().includes(searchLower)
+      s.code.toLowerCase().includes(searchLower) ||
+      s.city.toLowerCase().includes(searchLower)
     );
 
-    if (manualResults.length > 0) {
-      return res.json({
-        success: true,
-        count: manualResults.length,
-        stations: manualResults,
-        source: 'manual'
-      });
-    }
+    console.log('✅ Found matching stations:', filtered.length);
 
     res.json({
       success: true,
-      count: 0,
-      stations: [],
-      message: 'No stations found'
+      count: filtered.length,
+      stations: filtered,
+      source: 'indian_locations'
     });
 
   } catch (error) {
@@ -1093,66 +1172,15 @@ router.get('/search', async (req, res) => {
     }
     console.log('🚂 Searching trains:', fromStationCode, '→', toStationCode);
 
-    // IRCTC getTrainBetweenStations endpoint (RapidAPI)
-    if (RAPIDAPI_KEY) {
-      try {
-        const response = await axios.get(
-          `https://${RAPIDAPI_HOST}/api/v3/trainBetweenStations`,
-          {
-            params: {
-              fromStationCode: fromStationCode.toUpperCase(),
-              toStationCode: toStationCode.toUpperCase()
-            },
-            headers: {
-              'x-rapidapi-key': RAPIDAPI_KEY,
-              'x-rapidapi-host': RAPIDAPI_HOST
-            },
-            timeout: 15000
-          }
-        );
-
-        const trainsData = response.data.data || [];
-        console.log('✅ Found trains from IRCTC API:', trainsData.length);
-
-        if (trainsData.length > 0) {
-          const formattedTrains = trainsData.map(train => ({
-            train_number: train.train_number,
-            train_name: train.train_name,
-            train_type: train.train_type || 'Express',
-            from_station_code: fromStationCode,
-            from_station_name: train.from_station_name || fromStationCode,
-            to_station_code: toStationCode,
-            to_station_name: train.to_station_name || toStationCode,
-            from_time: train.from_std || train.from_time || 'N/A',
-            to_time: train.to_std || train.to_time || 'N/A',
-            duration: train.duration || 'N/A',
-            class_type: train.class_type || ['SL', '3A', '2A', '1A'],
-            running_days: train.running_days || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            source: 'irctc_api'
-          }));
-
-          return res.json({
-            success: true,
-            count: formattedTrains.length,
-            trains: formattedTrains,
-            source: 'irctc_api'
-          });
-        }
-      } catch (err) {
-        console.error('RapidAPI IRCTC Train error:', err.message);
-      }
-    }
-
-    // Fallback: Sample data for common routes (includes toy train)
-    const fallbackTrains = getFallbackTrains(fromStationCode.toUpperCase(), toStationCode.toUpperCase());
-    if (fallbackTrains.length > 0) {
-      console.log('✅ Using fallback trains:', fallbackTrains.length);
+    // Call dynamic schedules generator using our Indian locations
+    const trains = generateDynamicTrains(fromStationCode.toUpperCase(), toStationCode.toUpperCase());
+    
+    if (trains.length > 0) {
       return res.json({
         success: true,
-        count: fallbackTrains.length,
-        trains: fallbackTrains,
-        source: 'fallback',
-        message: 'Using cached train data'
+        count: trains.length,
+        trains: trains,
+        source: 'dynamic_generator'
       });
     }
 
@@ -1172,94 +1200,5 @@ router.get('/search', async (req, res) => {
     });
   }
 });
-
-// Fallback train data for common routes
-function getFallbackTrains(from, to) {
-  const routes = {
-    'NDLS-CDG': [
-      {
-        train_number: '12011',
-        train_name: 'Kalka Shatabdi',
-        train_type: 'Shatabdi',
-        from_time: '07:20',
-        to_time: '10:50',
-        duration: '3h 30m',
-        class_type: ['CC', 'EC']
-      },
-      {
-        train_number: '12045',
-        train_name: 'CDG Shatabdi',
-        train_type: 'Shatabdi',
-        from_time: '16:25',
-        to_time: '19:55',
-        duration: '3h 30m',
-        class_type: ['CC', 'EC']
-      }
-    ],
-    'CDG-KLK': [
-      {
-        train_number: '52455',
-        train_name: 'CDG KLK Passenger',
-        train_type: 'Passenger',
-        from_time: '09:20',
-        to_time: '10:00',
-        duration: '40m',
-        class_type: ['2S']
-      }
-    ],
-    'KLK-CDG': [
-      {
-        train_number: '52456',
-        train_name: 'KLK CDG Passenger',
-        train_type: 'Passenger',
-        from_time: '18:00',
-        to_time: '18:40',
-        duration: '40m',
-        class_type: ['2S']
-      }
-    ],
-    // Toy train routes
-    'KLK-SML': [
-      {
-        train_number: '52457',
-        train_name: 'Kalka-Shimla Toy Train',
-        train_type: 'Toy Train',
-        from_time: '07:00',
-        to_time: '12:10',
-        duration: '5h 10m',
-        class_type: ['2S', 'FC'],
-        price: 40 // ₹40 toy train fare
-      }
-    ],
-    'SML-KLK': [
-      {
-        train_number: '52458',
-        train_name: 'Shimla-Kalka Toy Train',
-        train_type: 'Toy Train',
-        from_time: '15:50',
-        to_time: '20:00',
-        duration: '4h 10m',
-        class_type: ['2S', 'FC'],
-        price: 40 // ₹40 toy train fare
-      }
-    ]
-  };
-
-  const key = `${from}-${to}`;
-  const trains = routes[key] || [];
-  return trains.map(train => ({
-    ...train,
-    from_station_code: from,
-    to_station_code: to,
-    from_station_name: from,
-    to_station_name: to,
-    from_std: train.from_time,
-    to_std: train.to_time,
-    distance: 0,
-    running_days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    price: train.price || 40,
-    source: 'fallback'
-  }));
-}
 
 module.exports = router;

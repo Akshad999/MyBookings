@@ -5,36 +5,80 @@ import '../styles/BusSeatSelection.css';
 
 const BusSeatSelection = ({ bus, onClose, onConfirm }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [currentDeck, setCurrentDeck] = useState('lower');
 
-  const generateSeats = () => {
-    const seats = [];
-    const rows = 10;
-    const seatsPerRow = 4;
-    
-    for (let row = 1; row <= rows; row++) {
-      for (let col = 1; col <= seatsPerRow; col++) {
-        const seatNumber = `${row}${String.fromCharCode(64 + col)}`;
-        seats.push({
-          number: seatNumber,
-          isAvailable: Math.random() > 0.3
-        });
-      }
+  const busType = bus.type || '';
+  const isSleeper = busType.toLowerCase().includes('sleeper') && !busType.toLowerCase().includes('semi-sleeper');
+
+  // Deterministic seat booking based on seat name and bus operator
+  const getSeatAvailability = (seatNumber) => {
+    const operator = bus.operator || '';
+    let hash = 0;
+    for (let i = 0; i < operator.length; i++) {
+      hash += operator.charCodeAt(i);
     }
-    return seats;
+    for (let i = 0; i < seatNumber.length; i++) {
+      hash += seatNumber.charCodeAt(i);
+    }
+    return (hash % 10) >= 4; // ~60% available
   };
 
-  const seats = generateSeats();
+  // Generate seats once and store in state
+  const [seatsData] = useState(() => {
+    const data = {};
+    if (isSleeper) {
+      // 15 seats Lower Deck, 15 seats Upper Deck
+      // 5 rows, 3 seats per row (2 + Aisle + 1)
+      const decks = ['lower', 'upper'];
+      decks.forEach(deck => {
+        const prefix = deck === 'lower' ? 'L' : 'U';
+        const deckSeats = [];
+        for (let row = 1; row <= 5; row++) {
+          // Col A, Col B, Col C
+          ['A', 'B', 'C'].forEach(col => {
+            const num = `${prefix}-${row}${col}`;
+            deckSeats.push({
+              number: num,
+              row,
+              col,
+              isAvailable: getSeatAvailability(num)
+            });
+          });
+        }
+        data[deck] = deckSeats;
+      });
+    } else {
+      // Seater: 40 seats
+      // 10 rows, 4 seats per row (2 + Aisle + 2)
+      const seaterSeats = [];
+      for (let row = 1; row <= 10; row++) {
+        ['A', 'B', 'C', 'D'].forEach(col => {
+          const num = `${row}${col}`;
+          seaterSeats.push({
+            number: num,
+            row,
+            col,
+            isAvailable: getSeatAvailability(num)
+          });
+        });
+      }
+      data.seater = seaterSeats;
+    }
+    return data;
+  });
 
   const toggleSeat = (seatNumber) => {
-    if (selectedSeats.includes(seatNumber)) {
-      setSelectedSeats(selectedSeats.filter(s => s !== seatNumber));
-    } else {
-      if (selectedSeats.length < 6) {
-        setSelectedSeats([...selectedSeats, seatNumber]);
+    setSelectedSeats(prev => {
+      if (prev.includes(seatNumber)) {
+        return prev.filter(s => s !== seatNumber);
       } else {
-        alert('Maximum 6 seats can be selected');
+        if (prev.length >= 6) {
+          alert('Maximum 6 seats can be selected');
+          return prev;
+        }
+        return [...prev, seatNumber];
       }
-    }
+    });
   };
 
   const handleConfirm = () => {
@@ -43,6 +87,79 @@ const BusSeatSelection = ({ bus, onClose, onConfirm }) => {
       return;
     }
     onConfirm(selectedSeats);
+  };
+
+  // Render a cell in the grid
+  const renderSeat = (seat, type) => {
+    const selected = selectedSeats.includes(seat.number);
+    const booked = !seat.isAvailable;
+
+    let seatClass = type === 'sleeper' ? 'seat-sleeper' : 'seat-chair';
+    if (booked) seatClass += ' booked';
+    else if (selected) seatClass += ' selected';
+    else seatClass += ' available';
+
+    return (
+      <button
+        key={seat.number}
+        type="button"
+        className={seatClass}
+        disabled={booked}
+        onClick={() => toggleSeat(seat.number)}
+        title={`Seat ${seat.number} (${booked ? 'Booked' : 'Available'})`}
+      >
+        {seat.number}
+      </button>
+    );
+  };
+
+  // Generate grid cells including aisle spacers
+  const renderSeaterGrid = () => {
+    const gridCells = [];
+    const rawSeats = seatsData.seater || [];
+    
+    // Group seats by row
+    for (let r = 1; r <= 10; r++) {
+      const rowSeats = rawSeats.filter(s => s.row === r);
+      // Col A, Col B, Spacer, Col C, Col D
+      const seatA = rowSeats.find(s => s.col === 'A');
+      const seatB = rowSeats.find(s => s.col === 'B');
+      const seatC = rowSeats.find(s => s.col === 'C');
+      const seatD = rowSeats.find(s => s.col === 'D');
+
+      if (seatA) gridCells.push(renderSeat(seatA, 'seater'));
+      if (seatB) gridCells.push(renderSeat(seatB, 'seater'));
+      
+      // Aisle Spacer
+      gridCells.push(<div key={`spacer-${r}`} className="aisle-spacer" />);
+      
+      if (seatC) gridCells.push(renderSeat(seatC, 'seater'));
+      if (seatD) gridCells.push(renderSeat(seatD, 'seater'));
+    }
+    return gridCells;
+  };
+
+  const renderSleeperGrid = () => {
+    const gridCells = [];
+    const rawSeats = seatsData[currentDeck] || [];
+
+    // Group seats by row
+    for (let r = 1; r <= 5; r++) {
+      const rowSeats = rawSeats.filter(s => s.row === r);
+      // Col A, Col B, Spacer, Col C
+      const seatA = rowSeats.find(s => s.col === 'A');
+      const seatB = rowSeats.find(s => s.col === 'B');
+      const seatC = rowSeats.find(s => s.col === 'C');
+
+      if (seatA) gridCells.push(renderSeat(seatA, 'sleeper'));
+      if (seatB) gridCells.push(renderSeat(seatB, 'sleeper'));
+      
+      // Aisle Spacer
+      gridCells.push(<div key={`spacer-${r}`} className="aisle-spacer" />);
+      
+      if (seatC) gridCells.push(renderSeat(seatC, 'sleeper'));
+    }
+    return gridCells;
   };
 
   return (
@@ -63,7 +180,7 @@ const BusSeatSelection = ({ bus, onClose, onConfirm }) => {
         >
           <div className="seat-modal-header">
             <h2>Select Your Seats</h2>
-            <button className="close-btn" onClick={onClose}>
+            <button type="button" className="close-btn" onClick={onClose}>
               <FiX />
             </button>
           </div>
@@ -71,6 +188,7 @@ const BusSeatSelection = ({ bus, onClose, onConfirm }) => {
           <div className="bus-details">
             <h3>{bus.operator}</h3>
             <p>{bus.from} → {bus.to}</p>
+            <div className="bus-type-info">{bus.type}</div>
           </div>
 
           <div className="seat-legend">
@@ -89,33 +207,50 @@ const BusSeatSelection = ({ bus, onClose, onConfirm }) => {
           </div>
 
           <div className="seats-container">
-            <div className="driver-section">🚗 Driver</div>
-            <div className="seats-grid">
-              {seats.map((seat) => (
+            {isSleeper && (
+              <div className="deck-tabs">
                 <button
-                  key={seat.number}
-                  className={`seat ${
-                    !seat.isAvailable ? 'booked' : 
-                    selectedSeats.includes(seat.number) ? 'selected' : 
-                    'available'
-                  }`}
-                  disabled={!seat.isAvailable}
-                  onClick={() => toggleSeat(seat.number)}
+                  type="button"
+                  className={`deck-tab ${currentDeck === 'lower' ? 'active' : ''}`}
+                  onClick={() => setCurrentDeck('lower')}
                 >
-                  {seat.number}
+                  Lower Deck
                 </button>
-              ))}
+                <button
+                  type="button"
+                  className={`deck-tab ${currentDeck === 'upper' ? 'active' : ''}`}
+                  onClick={() => setCurrentDeck('upper')}
+                >
+                  Upper Deck
+                </button>
+              </div>
+            )}
+
+            <div className="bus-body">
+              <div className="driver-section">
+                <span>Driver Cabin</span>
+                <span>🚪 Entry</span>
+              </div>
+              
+              <div className={isSleeper ? 'seats-grid-sleeper' : 'seats-grid-seater'}>
+                {isSleeper ? renderSleeperGrid() : renderSeaterGrid()}
+              </div>
             </div>
           </div>
 
           <div className="seat-modal-footer">
             <div className="selected-info">
-              <p>Selected Seats: {selectedSeats.join(', ') || 'None'}</p>
+              <p>Selected Seats: <strong>{selectedSeats.join(', ') || 'None'}</strong></p>
               <p className="total-price">
                 Total: ₹{selectedSeats.length * bus.price}
               </p>
             </div>
-            <button className="btn-confirm" onClick={handleConfirm}>
+            <button
+              type="button"
+              className="btn-confirm"
+              disabled={selectedSeats.length === 0}
+              onClick={handleConfirm}
+            >
               Confirm & Proceed
             </button>
           </div>

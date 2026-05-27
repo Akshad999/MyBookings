@@ -11,6 +11,8 @@ router.post("/send", async (req, res) => {
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   otps.set(email, otp);
+  // Expire OTP after 5 minutes
+  setTimeout(() => otps.delete(email), 5 * 60 * 1000);
 
   try {
     const transporter = nodemailer.createTransport({

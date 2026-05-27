@@ -38,7 +38,7 @@ function App() {
               <Route path="/booking" element={<BookingHome />} />
               <Route path="/booking/train" element={<TrainBooking />} />
               <Route path="/booking/bus" element={<BusBooking />} />
-               <Route path="/booking/train" element={<TrainBooking />} />
+              
       <Route path="/booking/train/confirm" element={<TrainBookingConfirm />} />
       <Route path="/booking/train/payment" element={<TrainPayment />} />
       <Route path="/booking/bus/payment" element={<BusPayment />} />

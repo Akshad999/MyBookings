@@ -108,6 +108,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { FiMail, FiLock } from 'react-icons/fi';
 import '../styles/login.css';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -120,10 +121,11 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(email, password); // throws if fails
-      navigate('/');
-    } catch (error) {
-      // handled in AuthContext by toast
+      await login(email, password); // Ensure AuthContext login throws on failure
+      toast.success("Logged in successfully!");
+      navigate('/'); // Redirect to home after login
+    } catch (err) {
+      toast.error(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -134,7 +136,8 @@ const Login = () => {
       <motion.div className="auth-card"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}>
+        transition={{ duration: 0.5 }}
+      >
         <div className="auth-header">
           <h1>Welcome Back! 👋</h1>
           <p>Login to access your account</p>

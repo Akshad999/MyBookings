@@ -1,0 +1,333 @@
+/* TrainSeatSelection.css */
+.train-seat-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  padding: 20px;
+}
+
+.train-seat-modal {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  padding: 24px;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.train-seat-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #ffccbc;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+.train-seat-modal-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #844728;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.close-btn:hover {
+  color: #ef4444;
+}
+
+.train-details-banner {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.train-details-banner h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #4e342e;
+}
+
+.train-details-banner p {
+  margin: 0;
+  font-size: 13px;
+  color: #795548;
+}
+
+.class-badge {
+  background: #844728;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Legend Styling */
+.train-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  background: #fbe9e7;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.legend-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.legend-swatch.available { background: #e0f2f1; border-color: #4db6ac; }
+.legend-swatch.selected { background: #ff9800; border-color: #fb8c00; }
+.legend-swatch.booked { background: #ffebee; border-color: #e57373; cursor: not-allowed; }
+
+.legend-swatch.lb { background: #e8f5e9; border-color: #81c784; }
+.legend-swatch.mb { background: #e3f2fd; border-color: #64b5f6; }
+.legend-swatch.ub { background: #f3e5f5; border-color: #ba68c8; }
+.legend-swatch.side { background: #fffde7; border-color: #fff176; }
+
+/* Coach visual container */
+.coach-container {
+  border: 4px solid #8d6e63;
+  border-radius: 16px;
+  background: #f5f5f5;
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.coach-header {
+  text-align: center;
+  font-weight: 700;
+  color: #795548;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+/* Compartment/Bay Layout */
+.coach-bay {
+  border: 1px dashed #bcaaa4;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  padding: 10px;
+  background: #ffffff;
+  position: relative;
+}
+
+.bay-label {
+  font-size: 11px;
+  color: #a1887f;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.bay-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.main-cabin {
+  display: flex;
+  justify-content: space-between;
+  background: #efebe9;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.cabin-side {
+  display: flex;
+  gap: 8px;
+}
+
+.aisle-corridor {
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0e0e0;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #888;
+  font-weight: 500;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.side-cabin {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  background: #efebe9;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* Seat/Berth Button styling */
+.train-berth {
+  width: 52px;
+  height: 48px;
+  border-radius: 6px;
+  border: 1px solid #bcaaa4;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.train-berth span.berth-num {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.train-berth span.berth-type {
+  font-size: 9px;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Berth Type Color Coding */
+.train-berth.avail-LB { background: #e8f5e9; border-color: #81c784; color: #2e7d32; }
+.train-berth.avail-MB { background: #e3f2fd; border-color: #64b5f6; color: #1565c0; }
+.train-berth.avail-UB { background: #f3e5f5; border-color: #ba68c8; color: #6a1b9a; }
+.train-berth.avail-SL, .train-berth.avail-SU { background: #fffde7; border-color: #fff176; color: #f57f17; }
+
+/* Selected State */
+.train-berth.selected-berth {
+  background: #ff9800 !important;
+  border-color: #e65100 !important;
+  color: #ffffff !important;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(255, 152, 0, 0.4);
+}
+
+/* Booked State */
+.train-berth.booked-berth {
+  background: #ffebee !important;
+  border-color: #ffcdd2 !important;
+  color: #c62828 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+/* Modal Footer */
+.train-seat-modal-footer {
+  border-top: 2px solid #ffccbc;
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selected-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.selected-summary p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.selected-summary .total-amt {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ff5722;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-cancel {
+  background: #efebe9;
+  border: 1px solid #bcaaa4;
+  color: #4e342e;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #d7ccc8;
+}
+
+.btn-confirm-seats {
+  background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+  border: none;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3);
+}
+
+.btn-confirm-seats:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(255, 87, 34, 0.4);
+}
+
+.btn-confirm-seats:disabled {
+  background: #e0e0e0;
+  color: #9e9e9e;
+  cursor: not-allowed;
+  box-shadow: none;
+}

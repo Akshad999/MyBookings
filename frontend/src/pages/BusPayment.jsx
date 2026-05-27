@@ -22,14 +22,7 @@ const BusPayment = () => {
 
   const handlePayment = async () => {
     setLoading(true);
-    
     try {
-      console.log("🚀 Sending booking request...");
-      console.log("Bus data:", bus);
-      console.log("From:", bus.from);
-      console.log("To:", bus.to);
-      console.log("Date:", date);
-      
       const bookingPayload = {
         type: "bus",
         bus: {
@@ -48,31 +41,22 @@ const BusPayment = () => {
         date: date || new Date(),
       };
 
-      console.log("📦 Full booking payload:", bookingPayload);
+      console.log("Booking payload:", bookingPayload);
 
       const { data } = await api.post('/tickets/book', bookingPayload);
-
-      console.log("✅ Response from server:", data);
+      console.log("API response:", data);
 
       if (data.success) {
-        toast.success("Bus booking confirmed! 🎉");
-        
-        // Navigate to My Bookings after short delay
-        setTimeout(() => {
-          navigate('/my-bookings');
-        }, 1500);
+        toast.success("Bus booking confirmed! 🎉", { duration: 1500 });
+        // Navigate to MyBookings after toast
+        setTimeout(() => navigate('/my-bookings'), 1500);
       } else {
-        toast.error(data.message || "Booking failed.");
+        toast.error(data.message || "Booking failed");
         setLoading(false);
       }
     } catch (err) {
-      console.error("❌ Payment error:", err);
-      console.error("Error response:", err.response?.data);
-      
-      const errorMessage = err.response?.data?.error || 
-                          err.response?.data?.message || 
-                          "Booking failed. Please try again.";
-      
+      console.error("Payment error:", err);
+      const errorMessage = err.response?.data?.message || "Booking failed. Please try again.";
       toast.error(errorMessage);
       setLoading(false);
     }
@@ -87,81 +71,25 @@ const BusPayment = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Header */}
           <div className="payment-header">
             <FaBus size={48} className="payment-icon" />
             <h2>Complete Your Payment</h2>
             <p>Review your booking details and confirm payment</p>
           </div>
 
-          {/* Booking Details */}
           <div className="booking-details">
             <h3>Booking Summary</h3>
-            
-            <div className="detail-row">
-              <span className="detail-label">
-                <FaBus /> Bus Operator
-              </span>
-              <span className="detail-value">{bus.operator}</span>
-            </div>
-
-            <div className="detail-row">
-              <span className="detail-label">Bus Type</span>
-              <span className="detail-value">{bus.busType}</span>
-            </div>
-
-            <div className="detail-row">
-              <span className="detail-label">
-                <FiMapPin /> Route
-              </span>
-              <span className="detail-value route">
-                {bus.from} → {bus.to}
-              </span>
-            </div>
-
-            <div className="detail-row">
-              <span className="detail-label">Departure</span>
-              <span className="detail-value">{bus.departure}</span>
-            </div>
-
-            <div className="detail-row">
-              <span className="detail-label">Arrival</span>
-              <span className="detail-value">{bus.arrival}</span>
-            </div>
-
-            <div className="detail-row">
-              <span className="detail-label">Duration</span>
-              <span className="detail-value">{bus.duration}</span>
-            </div>
-
-            <div className="detail-row">
-              <span className="detail-label">
-                <FiCalendar /> Journey Date
-              </span>
-              <span className="detail-value">
-                {new Date(date).toLocaleDateString('en-IN', {
-                  weekday: 'short',
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                })}
-              </span>
-            </div>
-
-            <div className="detail-row">
-              <span className="detail-label">
-                <FiUsers /> Selected Seats
-              </span>
-              <span className="detail-value seats">{seats.join(', ')}</span>
-            </div>
-
-            <div className="detail-row total-row">
-              <span className="detail-label">Total Amount</span>
-              <span className="detail-value total">₹{total}</span>
-            </div>
+            <div className="detail-row"><span className="detail-label"><FaBus /> Bus Operator</span><span className="detail-value">{bus.operator}</span></div>
+            <div className="detail-row"><span className="detail-label">Bus Type</span><span className="detail-value">{bus.busType}</span></div>
+            <div className="detail-row"><span className="detail-label"><FiMapPin /> Route</span><span className="detail-value route">{bus.from} → {bus.to}</span></div>
+            <div className="detail-row"><span className="detail-label">Departure</span><span className="detail-value">{bus.departure}</span></div>
+            <div className="detail-row"><span className="detail-label">Arrival</span><span className="detail-value">{bus.arrival}</span></div>
+            <div className="detail-row"><span className="detail-label">Duration</span><span className="detail-value">{bus.duration}</span></div>
+            <div className="detail-row"><span className="detail-label"><FiCalendar /> Journey Date</span><span className="detail-value">{new Date(date).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span></div>
+            <div className="detail-row"><span className="detail-label"><FiUsers /> Selected Seats</span><span className="detail-value seats">{seats.join(', ')}</span></div>
+            <div className="detail-row total-row"><span className="detail-label">Total Amount</span><span className="detail-value total">₹{total}</span></div>
           </div>
 
-          {/* Payment Method */}
           <div className="payment-methods">
             <h3>Payment Method</h3>
             <div className="payment-info">
@@ -170,7 +98,6 @@ const BusPayment = () => {
             </div>
           </div>
 
-          {/* Complete Payment Button */}
           <motion.button
             className="btn-complete-payment"
             onClick={handlePayment}
@@ -181,7 +108,6 @@ const BusPayment = () => {
             {loading ? 'Processing Payment...' : `Complete Payment of ₹${total}`}
           </motion.button>
 
-          {/* Go Back Button */}
           <button 
             className="btn-cancel-payment"
             onClick={() => navigate(-1)}
