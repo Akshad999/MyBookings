@@ -8,14 +8,7 @@ const Payment = ({ eventId, ticketTypeIndex, quantity }) => {
   const handlePay = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || ""}/api/payment/create-checkout-session`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ eventId, ticketTypeIndex, quantity }),
-        credentials: "include",
-      });
+      const response = await api.post('/payment/create-checkout-session', { eventId, ticketTypeIndex, quantity }, { withCredentials: true });
       const data = await response.json();
       if (data.success) {
         // Redirect to Stripe checkout

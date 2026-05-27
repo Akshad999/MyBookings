@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import api from '../utils/api';
 
 // Create context
 export const AuthContext = createContext();
@@ -19,17 +20,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include',
-      });
-
-      const data = await res.json();
-      if (res.ok) {
+      const res = await api.post('/auth/login', { email, password }, { withCredentials: true });
+      const data = res.data;
+      if (res.status >= 200 && res.status < 300) {
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
         toast.success('Logged in successfully');
@@ -39,23 +32,15 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.error(err);
-      toast.error('Network error during login');
+      toast.error(err.response?.data?.message || 'Network error during login');
     }
   };
 
   const signup = async (name, email, password) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-        credentials: 'include',
-      });
-
-      const data = await res.json();
-      if (res.ok) {
+      const res = await api.post('/auth/register', { name, email, password }, { withCredentials: true });
+      const data = res.data;
+      if (res.status >= 200 && res.status < 300) {
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
         toast.success('Account created and logged in');
